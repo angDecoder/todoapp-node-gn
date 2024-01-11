@@ -15,7 +15,6 @@ const createItem = async(req,res,next)=>{
     const schema = joi.object({
         title : joi.string().required(),
         description : joi.string().required(),
-        owner : joi.string().email().required(),       
     });
 
     let reqBody = { ... req.body };

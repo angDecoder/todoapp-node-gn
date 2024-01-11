@@ -7,7 +7,7 @@ const dbProperties = require('../../../database/dbProperties');
 const selectedDB = dbProperties.selectedDB;
 
 const createItem = async(req,res)=>{
-    const values = req.body;
+    const values = {...req.body};
     const apiReference = req.apiReference;
 
     try {
@@ -22,7 +22,7 @@ const createItem = async(req,res)=>{
 }
 
 const getList = async(req,res)=>{
-    let values = { };
+    let values = { ...req.body };
     // console.log(req.query,req.params);
 
     if( req?.query?.limit )
@@ -44,7 +44,7 @@ const getList = async(req,res)=>{
 }
 
 const updateItem = async(req,res)=>{
-    const values = { id : req?.params?.id };
+    const values = { id : req?.params?.id,...req.body };
     if( selectedDB==='mysql' )
         values.id = parseInt(req?.params?.id)
     const apiReference = req.apiReference;
@@ -64,7 +64,7 @@ const updateItem = async(req,res)=>{
 }
 
 const deleteItem = async(req,res)=>{
-    const values = { id : req?.params?.id };
+    const values = { id : req?.params?.id, ...req.body };
     if( selectedDB==='mysql' )
         values.id = parseInt(req?.params?.id);    
     const apiReference = req.apiReference;

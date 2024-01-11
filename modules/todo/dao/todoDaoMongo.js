@@ -20,10 +20,13 @@ const createItem = async (apiReference, values) => {
 
 const getList = async (apiReference, values) => {
     try {
-        const getListResponse = await Todo.find({ is_deleted: false })
+        const getListResponse = await Todo.find({ is_deleted: false, owner : values.owner })
             .sort({ created_at: 1 })
             .limit(values?.limit || 1000)
             .skip(values?.skip || 0);
+
+            console.log('here', values);
+        
 
         return {
             success: true,
@@ -41,8 +44,9 @@ const deleteItem = async (apiReference,values) => {
     try {
         
         const deleteItemResponse = await Todo.updateOne(
-            { _id : `${values?.id}` },
+            { _id : `${values?.id}`, owner : values.owner },
             { $set : { is_deleted : true } });
+
         
         logging.log(apiReference,{ EVENT : "DELETING TODO SUCCESSFULL ", ID :  values.id });
         return {
@@ -64,7 +68,7 @@ const updateItem = async (apiReference,values) => {
         
         
         const updateItemResponse = await Todo.updateOne(
-            { _id : `${values?.id}` },
+            { _id : `${values?.id}`,owner : values.owner },
             { $set : { completed : true } });
         
         logging.log(apiReference,{ EVENT : "UPDATING TODO SUCCESSFULL ", ID :  values.id });
