@@ -9,5 +9,4 @@ global.app = app;
 require('./middlewares')
 require('./modules');
 require('./startup').initializeServer();
-app.use("/", router);
 

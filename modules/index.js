@@ -1,3 +1,5 @@
 'use strict';
 
-require('./todo');
+
+app.use('/todo',require('./todo'));
+app.use('/user',require('./user'));

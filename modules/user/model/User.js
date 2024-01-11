@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const emailRegex = /i/;
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 const userSchema = new mongoose.Schema({
     email : {
         type : String,
@@ -8,7 +8,9 @@ const userSchema = new mongoose.Schema({
         validate : {
             validator : (v)=> emailRegex.test(v),
             message : (m)=>`email format not correct for "${m}"`,
-        }
+        },
+        unique : true,
+        index : true,
     },
     username : {
         type : String,
