@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 
 const loginServices = async (apiReference,values)=>{
     const loginResponse = await loginDao(apiReference,values);
-    const accessToken = await jwtServices.createJWT(apiReference,{email : values.email},"10 days");
+    const accessToken = jwtServices.createJWT(apiReference,{email : values.email},"10 days");
 
     if( !loginResponse.success )
         return loginResponse

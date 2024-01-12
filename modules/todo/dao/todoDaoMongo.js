@@ -1,5 +1,6 @@
 const logging = require('../../../logging');
 const Todo = require('../model/Todo');
+const mongoose = require('mongoose');
 
 const createItem = async (apiReference, values) => {
     try {
@@ -43,16 +44,29 @@ const getList = async (apiReference, values) => {
 const deleteItem = async (apiReference,values) => {
     try {
         
+        console.log(values);
         const deleteItemResponse = await Todo.updateOne(
             { _id : `${values?.id}`, owner : values.owner },
             { $set : { is_deleted : true } });
 
         
-        logging.log(apiReference,{ EVENT : "DELETING TODO SUCCESSFULL ", ID :  values.id });
-        return {
-            success: true,
-            data: deleteItemResponse,
+        if( deleteItemResponse?.matchedCount===1 ){
+            logging.log(apiReference,{ EVENT : "DELETING TODO SUCCESSFULL ", RESPONSE : deleteItemResponse });
+            return {
+                success: true,
+                data: deleteItemResponse,
+            }
+
         }
+
+        logging.logError(apiReference,{EVENT : "DELETING TODO ERROR", ERROR : "INVALID TODO ID OR YOU DON'T OWN THE TODO ITEM",});
+        return {
+            success : false,
+            error : {
+                message : "INVALID TODO ID OR YOU DON'T OWN THE TODO ITEM"
+            }
+        }
+        // throw new Error("");
     } catch (error) {
         logging.logError(apiReference,{ EVENT : "DELETING TODO FAILED ", ERROR : error });
 
@@ -66,16 +80,26 @@ const deleteItem = async (apiReference,values) => {
 const updateItem = async (apiReference,values) => {
     try {
         
-        
+        console.log(values);
         const updateItemResponse = await Todo.updateOne(
-            { _id : `${values?.id}`,owner : values.owner },
-            { $set : { completed : true } });
+            { _id : `${values?.id}` ,owner : values?.owner },
+            [{ $set : { completed : { $ne : ["$completed",true] } } }]
+        );
         
-        logging.log(apiReference,{ EVENT : "UPDATING TODO SUCCESSFULL ", ID :  values.id });
-        return {
-            success: true,
-            data: updateItemResponse,
+        if( updateItemResponse?.modifiedCount===1 && updateItemResponse?.matchedCount===1 ){
+            logging.log(apiReference,{ EVENT : "UPDATING TODO SUCCESSFULL ", RESPONSE : updateItemResponse });
+            return {
+                success: true,
+                data: updateItemResponse,
+            }
         }
+
+        logging.logError(apiReference,{ EVENT : "UPDATING TODO FAILED", ERROR : "INVALID TODO ID OR YOU DON'T OWN THE TODO ITEM"})
+        return { 
+            success : false,
+            error : "INVALID TODO ID OR YOU DON'T OWN THE TODO ITEM"
+        }
+
     } catch (error) {
         logging.logError(apiReference,{ EVENT : "UPDATING TODO FAILED ", ERROR : error });
 
